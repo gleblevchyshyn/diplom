@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'products.apps.ProductsConfig'
+    'apps.products.apps.ProductsConfig',
+    'apps.orders.apps.OrdersConfig',
+    'apps.users.apps.UsersConfig',
+    'apps.recommendations.apps.RecommendationsConfig'
 ]
 
 MIDDLEWARE = [
@@ -79,7 +82,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'mydb',
         'USER': 'root',
-        'PASSWORD': 'xnrffhg',
+        'PASSWORD': '111111',
         'HOST': 'localhost',
         'PORT': '3306',
     }

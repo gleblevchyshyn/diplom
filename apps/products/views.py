@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+import json
+
 
 # Create your views here.
-from .models import User, Orderstatus
+from .models import *
 
 
 def products(request):
-
-    return HttpResponse(Orderstatus.objects.all().values())
+    return HttpResponse('hi')

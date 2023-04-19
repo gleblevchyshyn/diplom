@@ -12,32 +12,40 @@ class Author(models.Model):
 
 class Book(models.Model):
     idbook = models.AutoField(db_column='idBook', primary_key=True)  # Field name made lowercase.
-    title = models.CharField(max_length=80)
+    title = models.CharField(max_length=255)
     average_rating = models.DecimalField(max_digits=2, decimal_places=1)
     description = models.TextField()
-    isbn = models.CharField(max_length=45)
+    isbn = models.CharField(max_length=13)
     num_pages = models.IntegerField(blank=True, null=True)
     publication_year = models.IntegerField()
     cover_img = models.TextField()
     price = models.DecimalField(max_digits=9, decimal_places=2)
     ratings_count = models.IntegerField()
     amount = models.IntegerField()
-    format_idformat = models.ForeignKey('Format', models.DO_NOTHING,
-                                        db_column='Format_idFormat')  # Field name made lowercase.
-    author_idauthor = models.ForeignKey(Author, models.DO_NOTHING,
-                                        db_column='Author_idAuthor')  # Field name made lowercase.
     language_idlanguage = models.ForeignKey('Language', models.DO_NOTHING,
                                             db_column='Language_idLanguage')  # Field name made lowercase.
-    publisher_idpublisher = models.ForeignKey('Publisher', models.DO_NOTHING,
-                                              db_column='Publisher_idPublisher')  # Field name made lowercase.
-    edition_information = models.CharField(max_length=100)
+    edition_information = models.CharField(max_length=250)
     is_ebook = models.IntegerField(blank=True, null=True)
     discount_iddiscount = models.ForeignKey('Discount', models.DO_NOTHING, db_column='Discount_idDiscount', blank=True,
                                             null=True)  # Field name made lowercase.
+    publisher = models.CharField(max_length=250)
+    format_idformat = models.ForeignKey('Format', models.DO_NOTHING,
+                                        db_column='Format_idFormat')  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'book'
+
+
+class Bookhasauthor(models.Model):
+    author_idauthor = models.OneToOneField(Author, models.DO_NOTHING, db_column='Author_idAuthor',
+                                           primary_key=True)  # Field name made lowercase. The composite primary key (Author_idAuthor, Book_idBook) found, that is not supported. The first column is selected.
+    book_idbook = models.ForeignKey(Book, models.DO_NOTHING, db_column='Book_idBook')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'bookhasauthor'
+        unique_together = (('author_idauthor', 'book_idbook'),)
 
 
 class Bookhasgenres(models.Model):
@@ -62,8 +70,8 @@ class Discount(models.Model):
 
 
 class Format(models.Model):
-    idformat = models.AutoField(db_column='idFormat', primary_key=True)  # Field name made lowercase.
-    format = models.CharField(max_length=45)
+    idformat = models.IntegerField(db_column='idFormat', primary_key=True)  # Field name made lowercase.
+    format = models.CharField(max_length=110)
 
     class Meta:
         managed = False
@@ -86,12 +94,3 @@ class Language(models.Model):
     class Meta:
         managed = False
         db_table = 'language'
-
-
-class Publisher(models.Model):
-    idpublisher = models.AutoField(db_column='idPublisher', primary_key=True)  # Field name made lowercase.
-    publisher = models.CharField(max_length=45)
-
-    class Meta:
-        managed = False
-        db_table = 'publisher'
