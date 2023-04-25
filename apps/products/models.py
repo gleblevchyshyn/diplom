@@ -22,14 +22,14 @@ class Book(models.Model):
     price = models.DecimalField(max_digits=9, decimal_places=2)
     ratings_count = models.IntegerField()
     amount = models.IntegerField()
-    language_idlanguage = models.ForeignKey('Language', models.DO_NOTHING,
+    language_idlanguage = models.ForeignKey('Language', models.RESTRICT,
                                             db_column='Language_idLanguage')  # Field name made lowercase.
     edition_information = models.CharField(max_length=250)
     is_ebook = models.IntegerField(blank=True, null=True)
-    discount_iddiscount = models.ForeignKey('Discount', models.DO_NOTHING, db_column='Discount_idDiscount', blank=True,
+    discount_iddiscount = models.ForeignKey('Discount', models.SET_NULL, db_column='Discount_idDiscount', blank=True,
                                             null=True)  # Field name made lowercase.
     publisher = models.CharField(max_length=250)
-    format_idformat = models.ForeignKey('Format', models.DO_NOTHING,
+    format_idformat = models.ForeignKey('Format', models.RESTRICT,
                                         db_column='Format_idFormat')  # Field name made lowercase.
 
     class Meta:
@@ -38,9 +38,9 @@ class Book(models.Model):
 
 
 class Bookhasauthor(models.Model):
-    author_idauthor = models.OneToOneField(Author, models.DO_NOTHING, db_column='Author_idAuthor',
+    author_idauthor = models.OneToOneField(Author, models.CASCADE, db_column='Author_idAuthor',
                                            primary_key=True)  # Field name made lowercase. The composite primary key (Author_idAuthor, Book_idBook) found, that is not supported. The first column is selected.
-    book_idbook = models.ForeignKey(Book, models.DO_NOTHING, db_column='Book_idBook')  # Field name made lowercase.
+    book_idbook = models.ForeignKey(Book, models.CASCADE, db_column='Book_idBook')  # Field name made lowercase.
 
     class Meta:
         managed = False
@@ -49,9 +49,9 @@ class Bookhasauthor(models.Model):
 
 
 class Bookhasgenres(models.Model):
-    book_idbook = models.OneToOneField(Book, models.DO_NOTHING, db_column='Book_idBook',
+    book_idbook = models.OneToOneField(Book, models.CASCADE, db_column='Book_idBook',
                                        primary_key=True)  # Field name made lowercase. The composite primary key (Book_idBook, Genre_idGenre) found, that is not supported. The first column is selected.
-    genre_idgenre = models.ForeignKey('Genre', models.DO_NOTHING,
+    genre_idgenre = models.ForeignKey('Genre', models.CASCADE,
                                       db_column='Genre_idGenre')  # Field name made lowercase.
 
     class Meta:

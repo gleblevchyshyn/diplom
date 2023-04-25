@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    {% block content %}
+  <h2>Welcome, {{ user.first_name }}!</h2>
+  <p>You are logged in.</p>
+  <form action="{% url 'user_logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+  </form>
+{% endblock %}
+</body>
+</html>
