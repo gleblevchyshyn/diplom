@@ -18,7 +18,7 @@ class Rewiev(models.Model):
     review_date = models.DateTimeField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'rewiev'
         unique_together = (('user_iduser', 'book_idbook'),)
 
@@ -28,6 +28,6 @@ class Wishlist(models.Model):
     user_iduser = models.ForeignKey(NewUser, models.CASCADE, db_column='User_idUser')  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'wishlist'
         unique_together = (('book_idbook', 'user_iduser'),)

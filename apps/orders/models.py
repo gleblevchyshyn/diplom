@@ -11,7 +11,7 @@ class Branch(models.Model):
     deliverycompany_iddeliverycompany = models.ForeignKey('Deliverycompany', models.RESTRICT, db_column='DeliveryCompany_idDeliveryCompany')  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'branch'
 
 
@@ -20,7 +20,7 @@ class Deliverycompany(models.Model):
     name = models.CharField(max_length=30)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'deliverycompany'
 
 
@@ -35,7 +35,7 @@ class Order(models.Model):
     user_iduser = models.ForeignKey(NewUser, models.CASCADE, db_column='User_idUser')  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'order'
 
 
@@ -46,7 +46,7 @@ class Orderitem(models.Model):
     is_recommended = models.IntegerField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'orderitem'
         unique_together = (('order_idorder', 'book_idbook'),)
 
@@ -56,7 +56,7 @@ class Orderstatus(models.Model):
     status = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'orderstatus'
 
 
@@ -65,5 +65,5 @@ class Payment(models.Model):
     payment_way = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'payment'

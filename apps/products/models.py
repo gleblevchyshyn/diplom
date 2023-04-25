@@ -6,7 +6,7 @@ class Author(models.Model):
     full_name = models.CharField(max_length=100)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'author'
 
 
@@ -33,7 +33,7 @@ class Book(models.Model):
                                         db_column='Format_idFormat')  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'book'
 
 
@@ -43,7 +43,7 @@ class Bookhasauthor(models.Model):
     book_idbook = models.ForeignKey(Book, models.CASCADE, db_column='Book_idBook')  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'bookhasauthor'
         unique_together = (('author_idauthor', 'book_idbook'),)
 
@@ -55,7 +55,7 @@ class Bookhasgenres(models.Model):
                                       db_column='Genre_idGenre')  # Field name made lowercase.
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'bookhasgenres'
         unique_together = (('book_idbook', 'genre_idgenre'),)
 
@@ -65,7 +65,7 @@ class Discount(models.Model):
     type = models.CharField(max_length=45)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'discount'
 
 
@@ -74,7 +74,7 @@ class Format(models.Model):
     format = models.CharField(max_length=110)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'format'
 
 
@@ -83,7 +83,7 @@ class Genre(models.Model):
     genre = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'genre'
 
 
@@ -92,5 +92,5 @@ class Language(models.Model):
     language = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'language'
