@@ -7,7 +7,11 @@ class NewUser(AbstractUser):
     age = models.IntegerField(blank=True, null=True)
     sex = models.CharField(max_length=1, blank=True, null=True)
     phone = models.CharField(max_length=15)
-    cashback = models.DecimalField(max_digits=9, decimal_places=2)
+    cashback = models.DecimalField(max_digits=9, decimal_places=2, default=0)
+    email = models.EmailField(unique=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
 
 class Rewiev(models.Model):

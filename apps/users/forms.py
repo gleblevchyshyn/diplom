@@ -1,16 +1,18 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from .models import NewUser
 
 
-class UserRegistrationForm(forms.Form):
-    first_name = forms.CharField(max_length=20)
-    second_name = forms.CharField(max_length=20)
-    age = forms.IntegerField(min_value=0, max_value=120)
-    sex = forms.ChoiceField(choices=[('M', 'Male'), ('F', 'Female')])
-    phone = forms.CharField(max_length=15)
-    email = forms.EmailField()
-    password = forms.CharField(max_length=16, widget=forms.PasswordInput)
+class RegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True, max_length=254)
+    username = forms.CharField(required=True, max_length=30)
+
+    class Meta:
+        model = NewUser
+        fields = ('email', 'username', 'first_name', 'last_name', 'password1', 'password2', 'age', 'sex', 'phone')
 
 
-class UserLoginForm(forms.Form):
-    email = forms.EmailField()
-    password = forms.CharField(max_length=16, widget=forms.PasswordInput)
+class LoginForm(AuthenticationForm):
+    class Meta:
+        model = NewUser
+        fields = ('email', 'password')
