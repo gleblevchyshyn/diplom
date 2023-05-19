@@ -1,0 +1,13 @@
+body {background-image: linear-gradient(to top, #a7baf3, #b9c1f0, #c8c8ed, #d5d0eb, #ded9e9);}
+
+.card-img-top {
+  object-fit: cover;
+  height: 200px; /* Set the desired height */
+}
+
+.card-title {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

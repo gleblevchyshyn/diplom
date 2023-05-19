@@ -70,7 +70,7 @@ class Discount(models.Model):
 
 
 class Format(models.Model):
-    idformat = models.IntegerField(db_column='idFormat', primary_key=True)  # Field name made lowercase.
+    idformat = models.AutoField(db_column='idFormat', primary_key=True)  # Field name made lowercase.
     format = models.CharField(max_length=110)
 
     class Meta:
