@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Previous Orders</title>
+</head>
+<body>
+    <h1>Previous Orders</h1>
+    {% if orders %}
+        <ul>
+            {% for order in orders %}
+                <li>
+                    Order ID: {{ order.idorder }}<br>
+                    Order Date: {{ order.order_date }}<br>
+                    Order Status: {{ order.orderstatus_idorderstatus.status }}<br>
+                    <!-- Add any other fields you want to display -->
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No previous orders found.</p>
+    {% endif %}
+</body>
+</html>

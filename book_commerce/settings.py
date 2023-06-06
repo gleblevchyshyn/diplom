@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'apps.products.apps.ProductsConfig',
     'apps.orders.apps.OrdersConfig',
     'apps.users.apps.UsersConfig',
-    'apps.recommendations.apps.RecommendationsConfig'
+   # 'apps.recommendations.apps.RecommendationsConfig',
+
 ]
 
 # REMOVE ________________________-
