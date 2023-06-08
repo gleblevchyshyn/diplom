@@ -1,7 +1,10 @@
+import os
+
 import pandas as pd
 import numpy as np
 import string
 import nltk.corpus as corpus
+from django.conf import settings
 from nltk.stem import WordNetLemmatizer
 import re
 import gensim.downloader as api
@@ -11,26 +14,47 @@ from surprise import SVD
 from surprise import Dataset
 from surprise import Reader
 from surprise.model_selection import cross_validate
+from sklearn.preprocessing import LabelEncoder
 
 
 class RecommendationSystems:
     def __init__(self):
-        self.books = pd.read_csv('processed_books.csv')
+        print("RECOMMENDATION SYSTEM CALL")
+        csv_file_path_books = os.path.join(settings.BASE_DIR, settings.BOOKS_DIR)
+        self.books = pd.read_csv(csv_file_path_books)
         self.books['author_ids'] = self.books['author'].apply(lambda x: ';'.join(str(i) for i in eval(x)))
-        self.reviews = pd.DataFrame()
-
-        self.tfidf_matrix = self.tf_idf_vectorization()
-        self.unique_book_ids = self.train_svd_model()
-        self.data = None
-        self.algo = None
 
         self.top_100_books_ids = self.top_100_books()
+        print("TOP 100 BOOK CALCULATED")
 
         self.lemmatizer = WordNetLemmatizer()
         self.stopwords = corpus.stopwords.words('english')
 
+        print("CLEANING DESCRIPTION")
+        self.clean_text_column('description')
+        print("CALCULATING TF-IDF")
+        self.tfidf_matrix = self.tf_idf_vectorization()
+
+        print("LOADING GLOVE MODEL")
         self.glove = api.load("glove-wiki-gigaword-300")
         self.embeddings = None
+
+        print('COLUMN TO GLOVE')
+        self.column_to_glove('description')
+
+        csv_file_path_reviews = os.path.join(settings.BASE_DIR, settings.REVIEWS_DIR)
+        print('READING REVIEWS CSV')
+        self.reviews = pd.read_csv(csv_file_path_reviews)
+
+        le1 = LabelEncoder()
+        le2 = LabelEncoder()
+        self.reviews['user_id'] = le1.fit_transform(self.reviews['user_id'])
+        self.reviews['book_id'] = le2.fit_transform(self.reviews['book_id'])
+
+        self.data = None
+        self.algo = None
+        print('TRAINING MODELS')
+        self.unique_book_ids = self.train_model()
 
 
 
@@ -74,7 +98,7 @@ class RecommendationSystems:
         if column_name in self.books.columns:
             self.books[f'glove_{column_name}'] = self.books[f'processed_{column_name}'].apply(
                 lambda x: self.string_to_glove(x))
-            if column_name == 'glove_description':
+            if column_name == 'description':
                 self.embeddings = np.array(self.books['glove_description'].tolist())
             return True
         return False
@@ -84,8 +108,8 @@ class RecommendationSystems:
         query_vec = self.string_to_glove(processed).reshape(1, -1)
         similarity = cosine_similarity(query_vec, self.embeddings).flatten()
         indices = np.argpartition(similarity, -50)[-50:]
-        results = self.books.iloc[indices]
-        return indices, results
+        ids = list(map(lambda x: x+1, indices))
+        return ids
 
     # COLLABORATIVE FILTERING RECOMMENDATION SYSTEM
     def cross_validate_svd_model(self, cv=5):
@@ -104,13 +128,13 @@ class RecommendationSystems:
 
         return results
 
-    def train_svd_model(self):
+    def train_model(self):
         results = self.cross_validate_svd_model()
         trainset = self.data.build_full_trainset()
         self.algo.fit(trainset)
 
         # Retrieve all book IDs from the dataset
-        all_book_ids = trainset.raw_ratings[:, 1]
+        all_book_ids = [book_id for (_, book_id, _) in trainset.all_ratings()]
         return set(all_book_ids)
 
     def predict(self, user_id=None):
@@ -150,12 +174,10 @@ class RecommendationSystems:
         tfidf_matrix = tfidf.fit_transform(self.books['text'])
         return tfidf_matrix
 
-    def get_similar_books(self, book_id, num_books=20):
-        # get the index of the given book
-        idx = self.books[self.books['book_id'] == book_id].index
+    def get_similar_books(self, book_index, num_books=20):
 
         # calculate the cosine similarity between the given book and all other books
-        cosine_sim = cosine_similarity(self.tfidf_matrix[idx], self.tfidf_matrix)
+        cosine_sim = cosine_similarity(self.tfidf_matrix[book_index-1], self.tfidf_matrix)
 
         # get the cosine similarity scores between the given book and all other books
         sim_scores = list(enumerate(cosine_sim[0]))
@@ -165,7 +187,6 @@ class RecommendationSystems:
 
         # get the indices of the top similar books
         sim_indices = [i[0] for i in sim_scores[1:num_books + 1]]
-
         return sim_indices
 
     # Top Books
@@ -182,5 +203,5 @@ class RecommendationSystems:
 
         # Get the indices of the top 100 books
         top_100_indices = sorted_df.head(100).index
-
-        return top_100_indices
+        ids = list(map(lambda x: x+1, top_100_indices))
+        return ids

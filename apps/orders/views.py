@@ -1,4 +1,3 @@
-from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
@@ -37,6 +36,7 @@ def cart(request):
     book_data = zip(books, book_qnt)
 
     # Render the cart template with the book_data
+    print(cart_items)
     return render(request, 'cart.html', {'book_data': book_data})
 
 
@@ -56,5 +56,31 @@ def remove_book(request, book_id):
     # Remove the book from the cart
     removed_book = cart.pop(book_index)
     request.session['cart'] = cart
-
+    print(cart)
     return redirect('cart')
+
+
+from django.http import JsonResponse
+
+
+def update_quantity(request, book_id):
+    cart = request.session.get('cart', [])
+
+    # Find the book in the cart and update its quantity
+    for item in cart:
+        if item['book_id'] == book_id:
+            # Get the new quantity from the request
+            quantity = int(request.POST.get('quantity', 0))
+
+            if quantity > 0:
+                # Update the quantity if it's greater than 0
+                item['quantity'] = quantity
+                request.session['cart'] = cart
+                return JsonResponse({'message': 'Quantity updated', 'cart': cart})
+            else:
+                # Remove the book from the cart if the quantity is 0
+                cart.remove(item)
+                request.session['cart'] = cart
+                return JsonResponse({'message': 'Book removed from cart', 'cart': cart})
+    print(cart)
+    return JsonResponse({'message': 'Book not found in cart'})

@@ -39,13 +39,14 @@
       </li>
     </ul>
   </div>
-      <form class="form-inline">
-    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-  </form>
+      <form class="form-inline" method="post" action="{% url 'search' %}">
+          {% csrf_token %}
+          <input class="form-control mr-sm-2" type="search" name="query" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      </form>
 </nav>
 
-    <h1 class="text-center">Books</h1>
+<h1 class="text-center">Books</h1>
     <div class="container">
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
         {% for book in books %}

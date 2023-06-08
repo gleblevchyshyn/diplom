@@ -42,24 +42,28 @@
                         </thead>
                         <tbody>
                             {% for book, quantity in book_data %}
-                                <tr>
-                                    <td class="p-4">
-                                        <div class="media align-items-center">
-                                            <img src="{{ book.cover_img }}" class="d-block ui-w-40 ui-bordered mr-4" alt="">
-                                            <div class="media-body">
-                                                <a href="#" class="d-block text-dark">{{ book.title }}</a>
+                                <div id="book-{{ book.id }}">
+                                    <tr>
+                                        <td class="p-4">
+                                            <div class="media align-items-center">
+                                                <img src="{{ book.cover_img }}" class="d-block ui-w-40 ui-bordered mr-4" alt="">
+                                                <div class="media-body">
+                                                    <a href="#" class="d-block text-dark">{{ book.title }}</a>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-right font-weight-semibold align-middle p-4">{{ book.price }}</td>
-                                    <td class="align-middle p-4">
-                                        <input type="text" class="form-control text-center" value="{{ quantity }}">
-                                    </td>
-                                    <td class="text-right font-weight-semibold align-middle p-4">{% widthratio book.price 1 quantity %}</td>
-                                    <td class="text-center align-middle px-0">
-                                        <a href="{% url 'remove_book' book_id=book.idbook %}" class="shop-tooltip close float-none text-danger" title="" data-original-title="Remove">×</a>
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td class="text-right font-weight-semibold align-middle p-4">{{ book.price }}</td>
+                                        <td class="align-middle p-4">
+                                            <input type="number" class="quantity-input form-control text-center" name="quantity" value="{{ quantity }}" min="1" step="1" data-book-id="{{ book.idbook }}">
+                                        </td>
+                                        <td class="text-right font-weight-semibold align-middle p-4" id="price-total-{{ book.idbook }}">
+                                            {% widthratio book.price 1 quantity %}
+                                        </td>
+                                        <td class="text-center align-middle px-0">
+                                            <a href="{% url 'remove_book' book_id=book.idbook %}" class="shop-tooltip close float-none text-danger" title="" data-original-title="Remove">×</a>
+                                        </td>
+                                    </tr>
+                                </div>
                             {% endfor %}
 
 
@@ -69,7 +73,8 @@
                 </div>
                 <!-- / Shopping cart table -->
 
-                <div class="d-flex flex-wrap justify-content-between align-items-center pb-4">
+Gleb, [07/06/2023 19:24]
+<div class="d-flex flex-wrap justify-content-between align-items-center pb-4">
                     <div class="mt-4">
                         <label class="text-muted font-weight-normal">Promocode</label>
                         <input type="text" placeholder="ABC" class="form-control">
@@ -94,6 +99,32 @@
             </div>
         </div>
     </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.quantity-input').change(function() {
+        var bookId = $(this).data('book-id');
+        var quantity = $(this).val();
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "update_quantity" 0 %}'.replace('0', bookId),
+            data: { csrfmiddlewaretoken: '{{ csrf_token }}',
+                    'quantity': quantity },
+            success: function(data) {
+                if (data.message === 'Quantity updated') {
+                    console.log('Quantity updated');
+                } else if (data.message === 'Book removed from cart') {
+                    $('#book-' + bookId).remove();
+                    console.log('Book removed from cart');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating quantity:', error);
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>
-

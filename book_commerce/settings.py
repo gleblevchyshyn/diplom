@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'apps.products.apps.ProductsConfig',
     'apps.orders.apps.OrdersConfig',
     'apps.users.apps.UsersConfig',
-   # 'apps.recommendations.apps.RecommendationsConfig',
+    'apps.recommendations.apps.RecommendationsConfig',
 
 ]
 
@@ -128,6 +128,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+BOOKS_DIR = 'static/processed_books.csv'
+REVIEWS_DIR = 'static/small_reviews.csv'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
