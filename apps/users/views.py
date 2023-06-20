@@ -1,7 +1,10 @@
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from .forms import RegistrationForm, LoginForm
+from ..products.models import Book
+from .models import Wishlist
 
 
 def registration(request):
@@ -41,3 +44,28 @@ def user_logout(request):
 @login_required
 def home(request):
     return render(request, 'home.html')
+
+
+@login_required
+def add_to_wishlist(request, book_id):
+    book = Book.objects.get(idbook=book_id)
+    user = request.user
+
+    wishlist, created = Wishlist.objects.update_or_create(
+        user_iduser=user, book_idbook=book
+    )
+
+    # Return a JSON response indicating the success or failure of the operation
+    response_data = {'message': 'Book added to wishlist'}
+    return JsonResponse(response_data)
+
+
+@login_required
+def wishlist(request):
+    user = request.user
+    wishlist_items = Wishlist.objects.filter(user_iduser=user)
+
+    context = {
+        'wishlist_items': wishlist_items
+    }
+    return render(request, 'wishlist.html', context)

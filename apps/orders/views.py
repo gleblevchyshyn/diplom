@@ -1,5 +1,8 @@
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core.checks import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 from .models import *
 
@@ -84,3 +87,90 @@ def update_quantity(request, book_id):
                 return JsonResponse({'message': 'Book removed from cart', 'cart': cart})
     print(cart)
     return JsonResponse({'message': 'Book not found in cart'})
+
+
+@login_required
+def make_order(request):
+    if request.method == 'POST':
+        # Retrieve form data
+        payment_id = request.POST.get('payment')
+        delivery_company_id = request.POST.get('delivery_company')
+        branch_id = request.POST.get('branch')
+
+        # Validate form data
+        if not (payment_id and delivery_company_id and branch_id):
+            return redirect('make_order')
+
+        # Create the order
+        try:
+            branch = Branch.objects.get(idbranch=branch_id)
+            delivery_company = Deliverycompany.objects.get(iddeliverycompany=delivery_company_id)
+            payment = Payment.objects.get(idpayment=payment_id)
+
+            # Create the order
+            order = Order.objects.create(
+                branch_idbranch=branch,
+                orderstatus_idorderstatus_id=1,
+                payment_idpayment=payment,
+                order_date=timezone.now(),
+                user_iduser=request.user
+            )
+
+            # Add items to the order
+            cart = request.session.get('cart', [])
+            for item in cart:
+                book_id = item['book_id']
+                quantity = item['quantity']
+                book = Book.objects.get(idbook=book_id)
+
+                Orderitem.objects.create(
+                    order_idorder=order,
+                    book_idbook=book,
+                    amount=quantity,
+                    is_recommended=0  # Assuming is_recommended is set to 0 initially
+                )
+
+            # Clear the cart
+            request.session['cart'] = []
+
+            return redirect('make_order')
+        except (Branch.DoesNotExist, Deliverycompany.DoesNotExist, Payment.DoesNotExist, Book.DoesNotExist):
+            return redirect('make_order')
+
+    # Retrieve data for form dropdowns
+    branches = Branch.objects.all()
+    delivery_companies = Deliverycompany.objects.all()
+    payments = Payment.objects.all()
+
+    context = {
+        'branches': branches,
+        'delivery_companies': delivery_companies,
+        'payments': payments
+    }
+    return render(request, 'order.html', context)
+
+
+@staff_member_required
+def admin_orders(request):
+    orders = Order.objects.select_related('user_iduser', 'branch_idbranch', 'payment_idpayment', 'orderstatus_idorderstatus').all()
+    order_statuses = Orderstatus.objects.all()
+
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        status_id = request.POST.get('status')
+
+        if order_id and status_id:
+            try:
+                order = Order.objects.get(idorder=order_id)
+                status = Orderstatus.objects.get(idorderstatus=status_id)
+                order.orderstatus_idorderstatus = status
+                order.save()
+                return redirect('admin_orders')
+            except (Order.DoesNotExist, Orderstatus.DoesNotExist):
+                pass
+
+    context = {
+        'orders': orders,
+        'order_statuses': order_statuses,
+    }
+    return render(request, 'admin_orders.html', context)

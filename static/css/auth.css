@@ -2,9 +2,9 @@ html, body {
             height: 100%;
         }
 body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    /*display: flex;*/
+    /*align-items: center;*/
+    /*justify-content: center;*/
     background-image: linear-gradient(to bottom, #839ce6, #a1aae6, #b9b8e7, #cdc8e7, #ded9e9);
 }
 .card {
